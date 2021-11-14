@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Http\Response;
@@ -15,6 +16,7 @@ class AdminController extends Controller
             'email' => 'required|string|unique:users,email|regex:/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix',
             'password' => 'required|string|confirmed|min:8|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$/',
             'username' => 'required|string',
+            'photo' => 'required|string',
             'phone' => 'required|string',
             'age' => 'required|string',
         ]);
@@ -24,10 +26,13 @@ class AdminController extends Controller
             'email' => $fields['email'],
             'password' => bcrypt($fields['password']),
             'username' => $fields['username'],
+            'photo' => $fields['photo'],
             'phone' => $fields['phone'],
-            'age' => $fields['age']
+            'age' => $fields['age'],
+            'is_admin' => true
         ]);
 
-        return response()->json($user);
+        return new UserResource($user);
+
     }
 }
