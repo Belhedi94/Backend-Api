@@ -14,7 +14,7 @@ class AuthController extends Controller
     public function register(Request $request) {   
         $fields = $request->validate([
             'name' => 'required|string',
-            'email' => 'required|string|unique:users,email|regex:/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix',
+            'email' => 'required|string|unique:users,email|email',
             'password' => 'required|string|confirmed|min:8|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$/',
             'username' => 'required|string',
             'phone' => 'required|string',
@@ -55,7 +55,7 @@ class AuthController extends Controller
         //Check Password
         if(!$user || !Hash::check($fields['password'], $user['password'])) {
             return response([
-                'message' => 'Bad creds'
+                'message' => 'Bad credentials'
             ], 401);
         }
 
@@ -69,7 +69,7 @@ class AuthController extends Controller
         return response($response, 201);
     }
 
-    public function logout(Request $request) {
+    public function logout() {
         auth()->user()->tokens()->delete();
 
         return [
