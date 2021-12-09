@@ -25,8 +25,7 @@ use App\Http\Controllers\ResetPasswordController;
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-//Route::post('verification/send', [EmailVerificationController::class, 'sendVerificationEmail'])->middleware('auth:sanctum');
-//Route::get('verification/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify')->middleware('auth:sanctum');
+
 //Route::get('products', [ProductController::class, 'index']);
 Route::get('products/{product}', [ProductController::class, 'show']);
 

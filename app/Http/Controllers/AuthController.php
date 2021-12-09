@@ -13,21 +13,41 @@ class AuthController extends Controller
 {
     public function register(Request $request) {   
         $fields = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|string|unique:users,email|email',
-            'password' => 'required|string|confirmed|min:8|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$/',
-            'username' => 'required|string',
-            'phone' => 'required|string',
-            'photo' => 'required|string',
-            'age' => 'required|string',
+            'first_name' => 'required|alpha|max:15',
+            'last_name' => 'required|alpha|max:15',
+            'email' => 'required|unique:users,email|email',
+            'password' => 'required|confirmed|min:8|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$/',
+            'username' => 'required|unique:users,username|regex:/^[a-zA-Z][a-z0-9_]*[a-z0-9]$/|max:15',
+            'photo' => 'image|mimes:jpg,jpeg,png',
+            'phone' => 'required|numeric',
+            'age' => 'required|numeric|max:90',
         ]);
 
+        // Handle File Upload
+        if($request->hasFile('photo')){
+            // Get filename with the extension
+            $filenameWithExt = $request->file('photo')->getClientOriginalName();
+            // Get just filename
+            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+            // Get just ext
+            $extension = $request->file('photo')->getClientOriginalExtension();
+            // Filename to store
+            $fileNameToStore= $filename.'_'.time().'.'.$extension;
+            // Upload Image
+            $path = $request->file('photo')->storeAs('public/photos', $fileNameToStore);
+
+
+        } else {
+            $fileNameToStore = 'no-image.jpg';
+        }
+
         $user = User::create([
-            'name' => $fields['name'],
+            'first_name' => $fields['first_name'],
+            'last_name' => $fields['last_name'],
             'email' => $fields['email'],
             'password' => bcrypt($fields['password']),
             'username' => $fields['username'],
-            'photo' => $fields['photo'],
+            'photo' => $fileNameToStore,
             'phone' => $fields['phone'],
             'age' => $fields['age']
         ]);
@@ -46,7 +66,7 @@ class AuthController extends Controller
 
     public function login(Request $request) {
         $fields = $request->validate([
-            'email' => 'required|string',
+            'email' => 'required|email',
             'password' => 'required|string'
         ]);
 
@@ -76,4 +96,5 @@ class AuthController extends Controller
             'message' => 'Successfully logged out'
         ];
     }
+
 }
