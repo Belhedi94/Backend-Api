@@ -96,4 +96,22 @@ class UserController extends Controller
             'message' =>'User deleted successfully'
         ]);
     }
+
+    public function sendSmsNotification()
+    {
+        $basic  = new \Nexmo\Client\Credentials\Basic('38abdc95', 'g9NpuespT3ztnYZv');
+        $client = new \Nexmo\Client($basic);
+
+        $response = $client->sms()->send(
+            new \Vonage\SMS\Message\SMS('21655570693', 'TemplateAPI', 'Test of sending a message through my Api.')
+        );
+
+        $message = $response->current();
+
+        if ($message->getStatus() == 0) {
+            return response()->json(['message' => 'The message was sent successfully']);
+        } else {
+            return response()->json(['message' => 'The message failed with status:'.$message->getStatus()]);
+        }
+    }
 }

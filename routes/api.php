@@ -60,3 +60,5 @@ Route::post('/email/verify/resend', function (Request $request) {
 
 Route::post('/forgot-password', [ResetPasswordController::class, 'forgotPassword']);
 Route::post('/reset-password', [ResetPasswordController::class, 'resetPassword']);
+
+Route::get('/send/sms', [UserController::class, 'sendSmsNotification']);
