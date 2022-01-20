@@ -20,12 +20,13 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('username');
+            $table->string('username')->unique();
             $table->boolean('is_admin')->default(false);
+            $table->boolean('is_super_admin')->default(false);
             $table->boolean('is_active')->default(true);
             $table->string('photo')->default('my_image.png');
             $table->string('phone')->nullable();
-            $table->integer('age')->nullable();
+            $table->date('birthdate')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

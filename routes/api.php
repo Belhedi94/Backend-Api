@@ -4,7 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\ResetPasswordController;
@@ -22,17 +23,20 @@ use App\Http\Controllers\ResetPasswordController;
 
 
 //Public routes
-Route::post('register', [AuthController::class, 'register']);
-Route::post('login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+Route::post('/register', [RegisterController::class, 'register'])->middleware('guest');
+Route::post('/login', [LoginController::class, 'authenticate'])->middleware('guest');
+Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:sanctum');
+
+Route::post('/users/{id}', [UserController::class, 'update']);
+Route::resource('users', UserController::class);
+
+Route::post('admins/create', [AdminController::class, 'createUser']);
 
 //Route::get('products', [ProductController::class, 'index']);
 Route::get('products/{product}', [ProductController::class, 'show']);
 
 Route::resource('products', ProductController::class);
 
-Route::resource('users', UserController::class);
-Route::post('admins/create', [AdminController::class, 'createUser']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('products/search/{name}', [ProductController::class, 'search']);

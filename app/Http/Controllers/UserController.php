@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use Illuminate\Http\Response;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
@@ -16,7 +17,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return UserResource::collection(User::all());   
+        return UserResource::collection(User::all());
     }
 
     /**
@@ -40,8 +41,44 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $fields = $request->validate([
+            'first_name' => 'required|alpha|max:15',
+            'last_name' => 'required|alpha|max:15',
+            'email' => ['required', 'email', Rule::unique('users')->ignore($id)],
+            'password' => ['required', 'confirmed',
+                Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()->uncompromised()],
+            'username' => ['required', 'regex:/^[a-zA-Z][a-z0-9_]*[a-z0-9]$/', 'max:15', Rule::unique('users')->ignore($id)],
+            'photo' => 'image|mimes:jpg,jpeg,png',
+            'phone' => 'required|numeric',
+            'birthdate' => 'required|date',
+        ]);
+
+        $fields['password'] = bcrypt($fields['password']);
+
         $user = User::find($id);
-        $user->update($request->all());
+
+        $user->update($fields);
+
+        if($request->hasFile('photo')){
+            // Get filename with the extension
+            $filenameWithExt = $request->file('photo')->getClientOriginalName();
+            // Get just filename
+            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+            // Get just ext
+            $extension = $request->file('photo')->getClientOriginalExtension();
+            // Filename to store
+            $fileNameToStore= $filename.'_'.time().'.'.$extension;
+            // Upload Image
+            $path = $request->file('photo')->storeAs('public/photos', $fileNameToStore);
+
+            $user->update(['photo' => $fileNameToStore]);
+
+        }
+
         return new UserResource($user);
     }
 

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Http\Response;
+use Illuminate\Validation\Rules\Password;
 
 class AdminController extends Controller
 {
@@ -14,10 +14,15 @@ class AdminController extends Controller
             'first_name' => 'required|alpha|max:15',
             'last_name' => 'required|alpha|max:15',
             'email' => 'required|unique:users,email|email',
-            'password' => 'required|confirmed|min:8|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$/',
+            'password' => ['required', 'confirmed',
+                Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()->uncompromised()],
             'username' => 'required|unique:users,username|regex:/^[a-zA-Z][a-z0-9_]*[a-z0-9]$/|max:15',
             'phone' => 'required|numeric',
-            'age' => 'required|numeric|max:90',
+            'birthdate' => 'required|date',
         ]);
 
         $user = User::create([
@@ -28,7 +33,7 @@ class AdminController extends Controller
             'username' => $fields['username'],
             'photo' => 'no-image.png',
             'phone' => $fields['phone'],
-            'age' => $fields['age'],
+            'birthdate' => $fields['birthdate'],
             'is_admin' => true,
             'is_active' => true
         ]);

@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
-
+use Carbon\Carbon;
 class UserSeeder extends Seeder
 {
     /**
@@ -21,9 +21,10 @@ class UserSeeder extends Seeder
             'password' => bcrypt('Rafaa94$'),
             'username' => 'Belhedi',
             'is_admin' => true,
+            'is_super_admin' => true,
             'is_active' => true,
             'phone' => '41056519',
-            'age' => '27',
+            'birthdate' => Carbon::parse('1994-04-15'),
             'photo' => 'my-image.png'
         ]);
     }
