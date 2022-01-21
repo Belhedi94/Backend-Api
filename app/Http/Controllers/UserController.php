@@ -7,6 +7,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -60,7 +61,7 @@ class UserController extends Controller
         $fields['password'] = bcrypt($fields['password']);
 
         $user = User::find($id);
-
+        $oldPhoto = $user->photo;
         $user->update($fields);
 
         if($request->hasFile('photo')){
@@ -74,6 +75,10 @@ class UserController extends Controller
             $fileNameToStore= $filename.'_'.time().'.'.$extension;
             // Upload Image
             $path = $request->file('photo')->storeAs('public/photos', $fileNameToStore);
+
+            if ($user->photo != 'no-image.png') {
+                Storage::delete('public/photos/'. $oldPhoto);
+            }
 
             $user->update(['photo' => $fileNameToStore]);
 
@@ -90,6 +95,10 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
+        $fileName = User::find($id)->photo;
+        if ($fileName != 'no-image.png') {
+            Storage::delete('public/photos/'.$fileName);
+        }
         User::destroy($id);
         return response()->json([
             'code' => 200,
