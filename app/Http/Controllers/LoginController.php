@@ -18,7 +18,7 @@ class LoginController extends Controller
 
         $loginType = filter_var($request->login, FILTER_VALIDATE_EMAIL ) ? 'email' : 'username';
 
-        if (Auth::attempt([$loginType => $fields['login'], 'password' => $fields['password']])) {
+        if (Auth::attempt([$loginType => $fields['login'], 'password' => $fields['password']], $request->remember)) {
             $user = User::where($loginType, $fields['login'])->first();
             $token = $user->createToken('myapptoken')->plainTextToken;
             $response = [
@@ -37,6 +37,12 @@ class LoginController extends Controller
 
     public function logout() {
         auth()->user()->tokens()->delete();
+
+        if (auth()->user()->getRememberToken() != null) {
+            $user = User::find(auth()->user()->getAuthIdentifier());
+            $user->remember_token = null;
+            $user->save();
+        }
 
         return response()->json([
             'message' => 'Successfully logged out'
