@@ -24,6 +24,7 @@ class UserResource extends JsonResource
             'is_super_admin' => $this->is_super_admin,
             'is_active' => $this->is_active,
             'phone' => $this->phone,
+            'sexe' => $this->sexe,
             'birthdate' => $this->birthdate,
             'photo' => $this->photo,
             'created_at' => $this->created_at,

@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Validation\Rules\Password;
 use App\Rules\Username;
+use Illuminate\Validation\Rule;
 
 class RegisterController extends Controller
 {
@@ -24,6 +25,7 @@ class RegisterController extends Controller
                     ->symbols()->uncompromised()],
             'username' => ['required','unique:users,username','min:5','max:15', new Username],
             'photo' => 'image|mimes:jpg,jpeg,png',
+            'sexe' => ['required', Rule::in(['M', 'F'])],
             'phone' => 'required|numeric',
             'birthdate' => 'required|date',
         ]);
@@ -55,6 +57,7 @@ class RegisterController extends Controller
             'is_admin' => false,
             'is_super_admin' => false,
             'is_active' => true,
+            'sexe' => $fields['sexe'],
             'photo' => $fileNameToStore,
             'phone' => $fields['phone'],
             'birthdate' => $fields['birthdate']

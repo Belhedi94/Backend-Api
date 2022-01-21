@@ -24,6 +24,7 @@ class CreateUsersTable extends Migration
             $table->boolean('is_admin')->default(false);
             $table->boolean('is_super_admin')->default(false);
             $table->boolean('is_active')->default(true);
+            $table->char('sexe');
             $table->string('photo')->default('my_image.png');
             $table->string('phone')->nullable();
             $table->date('birthdate')->nullable();

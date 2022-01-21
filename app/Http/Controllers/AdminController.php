@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Validation\Rules\Password;
 use App\Rules\Username;
+use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
@@ -22,6 +23,7 @@ class AdminController extends Controller
                     ->numbers()
                     ->symbols()->uncompromised()],
             'username' => ['required','unique:users,username','min:5','max:15', new Username],
+            'sexe' => ['required', Rule::in(['M', 'F'])],
             'phone' => 'required|numeric',
             'birthdate' => 'required|date',
         ]);
@@ -33,6 +35,7 @@ class AdminController extends Controller
             'password' => bcrypt($fields['password']),
             'username' => $fields['username'],
             'photo' => 'no-image.png',
+            'sexe' => $fields['sexe'],
             'phone' => $fields['phone'],
             'birthdate' => $fields['birthdate'],
             'is_admin' => true,

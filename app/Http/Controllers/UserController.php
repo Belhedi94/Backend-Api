@@ -55,6 +55,7 @@ class UserController extends Controller
                     ->symbols()->uncompromised()],
             'username' => ['required','min:5','max:15', new Username,  Rule::unique('users')->ignore($id)],
             'photo' => 'image|mimes:jpg,jpeg,png',
+            'sexe' => ['required', Rule::in(['M', 'F'])],
             'phone' => 'required|numeric',
             'birthdate' => 'required|date',
         ]);
