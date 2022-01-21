@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Storage;
+use App\Rules\Username;
 
 class UserController extends Controller
 {
@@ -52,7 +53,7 @@ class UserController extends Controller
                     ->mixedCase()
                     ->numbers()
                     ->symbols()->uncompromised()],
-            'username' => ['required', 'regex:/^[a-zA-Z][a-z0-9_]*[a-z0-9]$/', 'max:15', Rule::unique('users')->ignore($id)],
+            'username' => ['required','min:5','max:15', new Username,  Rule::unique('users')->ignore($id)],
             'photo' => 'image|mimes:jpg,jpeg,png',
             'phone' => 'required|numeric',
             'birthdate' => 'required|date',

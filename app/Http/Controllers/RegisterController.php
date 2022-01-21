@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Validation\Rules\Password;
+use App\Rules\Username;
 
 class RegisterController extends Controller
 {
@@ -21,7 +22,7 @@ class RegisterController extends Controller
                     ->mixedCase()
                     ->numbers()
                     ->symbols()->uncompromised()],
-            'username' => 'required|unique:users,username|regex:/^[a-zA-Z][a-z0-9_]*[a-z0-9]$/|max:15',
+            'username' => ['required','unique:users,username','min:5','max:15', new Username],
             'photo' => 'image|mimes:jpg,jpeg,png',
             'phone' => 'required|numeric',
             'birthdate' => 'required|date',
