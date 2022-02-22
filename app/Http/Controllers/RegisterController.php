@@ -56,7 +56,7 @@ class RegisterController extends Controller
             'username' => $fields['username'],
             'is_admin' => false,
             'is_super_admin' => false,
-            'is_active' => true,
+            'is_banned' => false,
             'sexe' => $fields['sexe'],
             'photo' => $fileNameToStore,
             'phone' => $fields['phone'],

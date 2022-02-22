@@ -22,7 +22,7 @@ class UserResource extends JsonResource
             'username' => $this->username,
             'is_admin' => $this->is_admin,
             'is_super_admin' => $this->is_super_admin,
-            'is_active' => $this->is_active,
+            'is_banned' => $this->is_banned,
             'phone' => $this->phone,
             'sexe' => $this->sexe,
             'birthdate' => $this->birthdate,

@@ -10,6 +10,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\ResetPasswordController;
 
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -22,43 +23,42 @@ use App\Http\Controllers\ResetPasswordController;
 */
 
 
-//Public routes
+//authentication/register routes
 Route::post('/register', [RegisterController::class, 'register'])->middleware('guest');
 Route::post('/login', [LoginController::class, 'authenticate'])->middleware('guest');
-Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:sanctum');
 
-Route::post('/users/{id}', [UserController::class, 'update']);
-Route::resource('users', UserController::class);
-
-Route::post('admins/create', [AdminController::class, 'createUser']);
 
 //Route::get('products', [ProductController::class, 'index']);
-Route::get('products/{product}', [ProductController::class, 'show']);
+//Route::get('products/{product}', [ProductController::class, 'show']);
 
-Route::resource('products', ProductController::class);
+//Route::resource('products', ProductController::class);
 
 
-Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::get('products/search/{name}', [ProductController::class, 'search']);
-    Route::post('/products', [ProductController::class, 'store']);
-    Route::put('/products/{product}', [ProductController::class, 'update']);
-    Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+//Route::group(['middleware' => ['auth:sanctum']], function () {
+//    Route::get('products/search/{name}', [ProductController::class, 'search']);
+//    Route::post('/products', [ProductController::class, 'store']);
+//    Route::put('/products/{product}', [ProductController::class, 'update']);
+//    Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+//
+//});
 
-});
-
-// Verify email
+// link to be clicked when receiving the verification email
 Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, '__invoke'])
     ->middleware(['signed', 'throttle:6,1'])
     ->name('verification.verify');
-
-// Resend link to verify email
-Route::post('/email/verify/resend', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
-    return back()->with('message', 'Verification link sent!');
-})->middleware(['auth:sanctum', 'throttle:6,1'])->name('verification.send');
-
-
+//forgot password routes
 Route::post('/forgot-password', [ResetPasswordController::class, 'forgotPassword']);
 Route::post('/reset-password', [ResetPasswordController::class, 'resetPassword']);
 
-Route::get('/send/sms', [UserController::class, 'sendSmsNotification']);
+Route::middleware(['auth:sanctum', 'account.activated'])->group(function () {
+    Route::post('/logout', [LoginController::class, 'logout']);
+    Route::post('/users/{id}', [UserController::class, 'update']);
+    Route::resource('users', UserController::class);
+    Route::post('admins/create', [AdminController::class, 'createUser']);
+    // Resend link to verify email
+    Route::post('/email/verify/resend', function (Request $request) {
+        $request->user()->sendEmailVerificationNotification();
+        return back()->with('message', 'Verification link sent!');
+    })->middleware('throttle:6,1')->name('verification.send');
+    Route::get('/send/sms', [UserController::class, 'sendSmsNotification']);
+});

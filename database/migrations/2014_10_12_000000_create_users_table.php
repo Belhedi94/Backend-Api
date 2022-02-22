@@ -23,7 +23,7 @@ class CreateUsersTable extends Migration
             $table->string('username')->unique();
             $table->boolean('is_admin')->default(false);
             $table->boolean('is_super_admin')->default(false);
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_banned')->default(true);
             $table->char('sexe');
             $table->string('photo')->default('my_image.png');
             $table->string('phone')->nullable();

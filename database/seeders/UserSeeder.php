@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
             'username' => 'Belhedi',
             'is_admin' => true,
             'is_super_admin' => true,
-            'is_active' => true,
+            'is_banned' => false,
             'sexe' => 'M',
             'phone' => '41056519',
             'birthdate' => Carbon::parse('1994-04-15'),
