@@ -28,20 +28,6 @@ Route::post('/register', [RegisterController::class, 'register'])->middleware('g
 Route::post('/login', [LoginController::class, 'authenticate'])->middleware('guest');
 
 
-//Route::get('products', [ProductController::class, 'index']);
-//Route::get('products/{product}', [ProductController::class, 'show']);
-
-//Route::resource('products', ProductController::class);
-
-
-//Route::group(['middleware' => ['auth:sanctum']], function () {
-//    Route::get('products/search/{name}', [ProductController::class, 'search']);
-//    Route::post('/products', [ProductController::class, 'store']);
-//    Route::put('/products/{product}', [ProductController::class, 'update']);
-//    Route::delete('/products/{product}', [ProductController::class, 'destroy']);
-//
-//});
-
 // link to be clicked when receiving the verification email
 Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, '__invoke'])
     ->middleware(['signed', 'throttle:6,1'])
