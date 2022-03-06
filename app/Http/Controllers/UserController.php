@@ -58,6 +58,7 @@ class UserController extends Controller
             'sexe' => ['required', Rule::in(['M', 'F'])],
             'phone' => 'required|numeric',
             'birthdate' => 'required|date',
+            'role_id' => Rule::in([1, 2, 3, 4]),
         ]);
 
         $fields['password'] = bcrypt($fields['password']);

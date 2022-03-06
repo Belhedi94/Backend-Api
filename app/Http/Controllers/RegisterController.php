@@ -61,7 +61,7 @@ class RegisterController extends Controller
             'photo' => $fileNameToStore,
             'phone' => $fields['phone'],
             'birthdate' => $fields['birthdate'],
-            'role_id' => 3
+            'role_id' => 4
         ]);
 
         event(new Registered($user));
