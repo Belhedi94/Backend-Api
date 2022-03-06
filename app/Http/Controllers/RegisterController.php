@@ -60,7 +60,8 @@ class RegisterController extends Controller
             'sexe' => $fields['sexe'],
             'photo' => $fileNameToStore,
             'phone' => $fields['phone'],
-            'birthdate' => $fields['birthdate']
+            'birthdate' => $fields['birthdate'],
+            'role_id' => 3
         ]);
 
         event(new Registered($user));

@@ -39,7 +39,8 @@ class AdminController extends Controller
             'phone' => $fields['phone'],
             'birthdate' => $fields['birthdate'],
             'is_admin' => true,
-            'is_banned' => true
+            'is_banned' => true,
+            'role_id' => 2
         ]);
 
         return new UserResource($user);

@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
             'password' => bcrypt('Rafaa94$'),
             'username' => 'Belhedi',
             'is_admin' => true,
-            'is_super_admin' => true,
+            'role_id' => 1,
             'is_banned' => false,
             'sexe' => 'M',
             'phone' => '41056519',

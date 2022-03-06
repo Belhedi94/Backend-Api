@@ -27,7 +27,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'username',
         'is_admin',
-        'is_super_admin',
+        'role_id',
         'is_banned',
         'sexe',
         'phone',
@@ -59,6 +59,10 @@ class User extends Authenticatable implements MustVerifyEmail
         $url = 'http://localhost:8000/api/reset-password?token='.$token;
 
         $this->notify(new ResetPasswordNotification($url));
+    }
+
+    public function role() {
+        return $this->belongsTo(Role::class);
     }
 
 }
