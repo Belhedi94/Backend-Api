@@ -27,6 +27,7 @@ class AdminController extends Controller
             'phone' => 'required|numeric',
             'birthdate' => 'required|date',
             'role_id' => Rule::in([1, 2, 3, 4])
+
         ]);
 
         $user = User::create([
@@ -40,12 +41,18 @@ class AdminController extends Controller
             'phone' => $fields['phone'],
             'birthdate' => $fields['birthdate'],
             'is_admin' => true,
-            'is_banned' => true,
             'role_id' => $fields['role_id']
         ]);
 
         return new UserResource($user);
 
+    }
+
+    public function getAdmins() {
+
+        $admins = User::where('is_admin', 1)->get();
+
+        return UserResource::collection($admins);
     }
 
 

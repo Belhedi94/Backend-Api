@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -37,9 +38,19 @@ Route::post('/reset-password', [ResetPasswordController::class, 'resetPassword']
 
 Route::middleware(['auth:sanctum', 'account.activated'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout']);
-    Route::post('/users/{id}', [UserController::class, 'update']);
-    Route::resource('users', UserController::class);
-    Route::post('admins/create', [AdminController::class, 'createUser']);
+
+    Route::get('users/{user}', [UserController::class, 'show']);
+    Route::post('/users/{user}', [UserController::class, 'update']);
+
+    Route::middleware('admin')->group(function() {
+        Route::post('admin/create', [AdminController::class, 'createUser']);
+        Route::get('admin/list', [AdminController::class, 'getAdmins']);
+        Route::patch('admin/ban/{id}', [UserController::class, 'banUser']);
+        Route::get('users', [UserController::class, 'index']);
+        Route::delete('/users/{id}', [UserController::class, 'destroy']);
+    });
+
+
     // Resend link to verify email
     Route::post('/email/verify/resend', function (Request $request) {
         $request->user()->sendEmailVerificationNotification();

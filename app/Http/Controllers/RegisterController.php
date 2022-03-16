@@ -27,7 +27,7 @@ class RegisterController extends Controller
             'photo' => 'image|mimes:jpg,jpeg,png',
             'sexe' => ['required', Rule::in(['M', 'F'])],
             'phone' => 'required|numeric',
-            'birthdate' => 'required|date',
+            'birthdate' => 'required|date'
         ]);
 
         // Handle File Upload
@@ -55,8 +55,6 @@ class RegisterController extends Controller
             'password' => bcrypt($fields['password']),
             'username' => $fields['username'],
             'is_admin' => false,
-            'is_super_admin' => false,
-            'is_banned' => false,
             'sexe' => $fields['sexe'],
             'photo' => $fileNameToStore,
             'phone' => $fields['phone'],

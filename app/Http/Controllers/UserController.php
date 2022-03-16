@@ -30,7 +30,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        return new UserResource(User::find($id));
+        return new UserResource(User::findOrfail($id));
     }
 
 
@@ -58,7 +58,7 @@ class UserController extends Controller
             'sexe' => ['required', Rule::in(['M', 'F'])],
             'phone' => 'required|numeric',
             'birthdate' => 'required|date',
-            'role_id' => Rule::in([1, 2, 3, 4]),
+            'role_id' => Rule::in([1, 2, 3, 4])
         ]);
 
         $fields['password'] = bcrypt($fields['password']);
@@ -125,5 +125,17 @@ class UserController extends Controller
         } else {
             return response()->json(['message' => 'The message failed with status:'.$message->getStatus()]);
         }
+    }
+
+    public function banUser($id) {
+        $user = User::findOrFail($id);
+        $user->update([
+            'is_banned' => 1
+        ]);
+
+        return response()->json([
+            'code' => 200,
+            'message' => $user->username.' is successfully banned'
+        ]);
     }
 }
