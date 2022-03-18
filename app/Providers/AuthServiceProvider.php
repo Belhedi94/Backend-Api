@@ -6,6 +6,7 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
+use App\Models\User;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -26,6 +27,26 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
+
+        Gate::define('create-user', function () {
+            return auth()->user()->is_admin == true;
+        });
+        Gate::define('update-user', function ($user, $id) {
+            return auth()->user()->id == $id;
+        });
+        Gate::define('get-users', function () {
+            return auth()->user()->is_admin == true;
+        });
+        Gate::define('ban-user', function () {
+            return auth()->user()->is_admin == true;
+        });
+        Gate::define('delete-user', function () {
+            return auth()->user()->is_admin == true;
+        });
+        Gate::define('get_admins', function () {
+            return auth()->user()->is_admin == true;
+        });
+
 
         VerifyEmail::toMailUsing(function ($notifiable, $url) {
             return (new MailMessage)

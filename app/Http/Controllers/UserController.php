@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Gate;
 use App\Models\User;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -19,6 +20,12 @@ class UserController extends Controller
      */
     public function index()
     {
+        if (! Gate::allows('get-users')) {
+            return response()->json([
+                'code' => 403,
+                'message' => 'You don\'t have permission to access this resource'
+            ]);
+        }
         return UserResource::collection(User::all());
     }
 
@@ -30,7 +37,13 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        return new UserResource(User::findOrfail($id));
+        $result = $this->doesUserExist($id);
+        if (gettype($result) == 'boolean') {
+            return new UserResource(User::findOrfail($id));
+        }
+
+        return $result;
+
     }
 
 
@@ -43,51 +56,63 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $fields = $request->validate([
-            'first_name' => 'required|alpha|max:15',
-            'last_name' => 'required|alpha|max:15',
-            'email' => ['required', 'email', Rule::unique('users')->ignore($id)],
-            'password' => ['required', 'confirmed',
-                Password::min(8)
-                    ->letters()
-                    ->mixedCase()
-                    ->numbers()
-                    ->symbols()->uncompromised()],
-            'username' => ['required','min:5','max:15', new Username,  Rule::unique('users')->ignore($id)],
-            'photo' => 'image|mimes:jpg,jpeg,png',
-            'sexe' => ['required', Rule::in(['M', 'F'])],
-            'phone' => 'required|numeric',
-            'birthdate' => 'required|date',
-            'role_id' => Rule::in([1, 2, 3, 4])
-        ]);
+        $result = $this->doesUserExist($id);
+        if (gettype($result) == 'boolean') {
+            if (! Gate::allows('update-user', $id)) {
+                return response()->json([
+                    'code' => 403,
+                    'message' => 'You are not authorized to do this action.'
+                ]);
+            }
+            $fields = $request->validate([
+                'first_name' => 'required|alpha|max:15',
+                'last_name' => 'required|alpha|max:15',
+                'email' => ['required', 'email', Rule::unique('users')->ignore($id)],
+                'password' => ['required', 'confirmed',
+                    Password::min(8)
+                        ->letters()
+                        ->mixedCase()
+                        ->numbers()
+                        ->symbols()->uncompromised()],
+                'username' => ['required','min:5','max:15', new Username,  Rule::unique('users')->ignore($id)],
+                'photo' => 'image|mimes:jpg,jpeg,png',
+                'sexe' => ['required', Rule::in(['M', 'F'])],
+                'phone' => 'required|numeric',
+                'birthdate' => 'required|date',
+                'role_id' => Rule::in([1, 2, 3, 4])
+            ]);
 
-        $fields['password'] = bcrypt($fields['password']);
+            $fields['password'] = bcrypt($fields['password']);
 
-        $user = User::find($id);
-        $oldPhoto = $user->photo;
-        $user->update($fields);
+            $user = User::find($id);
+            $oldPhoto = $user->photo;
+            $user->update($fields);
 
-        if($request->hasFile('photo')){
-            // Get filename with the extension
-            $filenameWithExt = $request->file('photo')->getClientOriginalName();
-            // Get just filename
-            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-            // Get just ext
-            $extension = $request->file('photo')->getClientOriginalExtension();
-            // Filename to store
-            $fileNameToStore= $filename.'_'.time().'.'.$extension;
-            // Upload Image
-            $path = $request->file('photo')->storeAs('public/photos', $fileNameToStore);
+            if($request->hasFile('photo')){
+                // Get filename with the extension
+                $filenameWithExt = $request->file('photo')->getClientOriginalName();
+                // Get just filename
+                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                // Get just ext
+                $extension = $request->file('photo')->getClientOriginalExtension();
+                // Filename to store
+                $fileNameToStore= $filename.'_'.time().'.'.$extension;
+                // Upload Image
+                $path = $request->file('photo')->storeAs('public/photos', $fileNameToStore);
 
-            if ($user->photo != 'no-image.png') {
-                Storage::delete('public/photos/'. $oldPhoto);
+                if ($user->photo != 'no-image.png') {
+                    Storage::delete('public/photos/'. $oldPhoto);
+                }
+
+                $user->update(['photo' => $fileNameToStore]);
+
             }
 
-            $user->update(['photo' => $fileNameToStore]);
-
+            return new UserResource($user);
+        } else {
+            return $result;
         }
 
-        return new UserResource($user);
     }
 
     /**
@@ -96,17 +121,28 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-        $fileName = User::find($id)->photo;
-        if ($fileName != 'no-image.png') {
-            Storage::delete('public/photos/'.$fileName);
+    public function destroy($id) {
+        if (! Gate::allows('delete-user')) {
+            return response()->json([
+                'code' => 403,
+                'message' => 'You don\'t have permission to access this resource'
+            ]);
         }
-        User::destroy($id);
-        return response()->json([
-            'code' => 200,
-            'message' =>'User deleted successfully'
-        ]);
+        $result = $this->doesUserExist($id);
+        if (gettype($result) == 'boolean') {
+            $fileName = User::find($id)->photo;
+            if ($fileName != 'no-image.png') {
+                Storage::delete('public/photos/'.$fileName);
+            }
+            User::destroy($id);
+            return response()->json([
+                'code' => 200,
+                'message' =>'User deleted successfully'
+            ]);
+        }
+
+        return $result;
+
     }
 
     public function sendSmsNotification()
@@ -128,14 +164,39 @@ class UserController extends Controller
     }
 
     public function banUser($id) {
-        $user = User::findOrFail($id);
-        $user->update([
-            'is_banned' => 1
-        ]);
+        if (! Gate::allows('ban-user')) {
+            return response()->json([
+                'code' => 403,
+                'message' => 'You don\'t have permission to access this resource'
+            ]);
+        }
+        $result = $this->doesUserExist($id);
+        if (gettype($result) == 'boolean') {
+            $user = User::findOrFail($id);
+            $user->update([
+                'is_banned' => 1
+            ]);
 
-        return response()->json([
-            'code' => 200,
-            'message' => $user->username.' is successfully banned'
-        ]);
+            return response()->json([
+                'code' => 200,
+                'message' => $user->username.' is successfully banned'
+            ]);
+        }
+
+        return $result;
+
+    }
+
+    public function doesUserExist($id) {
+
+        $user = User::find($id);
+        if(!isset($user)) {
+            return response()->json([
+                'code' =>404,
+                'message' => 'Not Found'
+            ]);
+        }
+        else
+            return true;
     }
 }

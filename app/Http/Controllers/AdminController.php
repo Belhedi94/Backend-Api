@@ -8,10 +8,17 @@ use App\Models\User;
 use Illuminate\Validation\Rules\Password;
 use App\Rules\Username;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Gate;
 
 class AdminController extends Controller
 {
     public function createUser(Request $request) {
+        if (! Gate::allows('create-user')) {
+            return response()->json([
+                'code' => 403,
+                'message' => 'You don\'t have permission to access this resource.'
+            ])->setStatusCode(403);
+        }
         $fields = $request->validate([
             'first_name' => 'required|alpha|max:15',
             'last_name' => 'required|alpha|max:15',
@@ -49,7 +56,12 @@ class AdminController extends Controller
     }
 
     public function getAdmins() {
-
+        if (! Gate::allows('get-admins')) {
+            return response()->json([
+                'code' => 403,
+                'message' => 'You don\'t have permission to access this resource'
+            ]);
+        }
         $admins = User::where('is_admin', 1)->get();
 
         return UserResource::collection($admins);
