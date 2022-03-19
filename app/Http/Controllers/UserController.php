@@ -22,11 +22,10 @@ class UserController extends Controller
     {
         if (! Gate::allows('get-users')) {
             return response()->json([
-                'code' => 403,
                 'message' => 'You don\'t have permission to access this resource'
-            ]);
+            ], 403);
         }
-        return UserResource::collection(User::all());
+        return UserResource::collection(User::all())->response()->setStatusCode(200);
     }
 
     /**
@@ -39,7 +38,7 @@ class UserController extends Controller
     {
         $result = $this->doesUserExist($id);
         if (gettype($result) == 'boolean') {
-            return new UserResource(User::findOrfail($id));
+            return (new UserResource(User::findOrfail($id)))->response()->setStatusCode();
         }
 
         return $result;
@@ -60,9 +59,8 @@ class UserController extends Controller
         if (gettype($result) == 'boolean') {
             if (! Gate::allows('update-user', $id)) {
                 return response()->json([
-                    'code' => 403,
                     'message' => 'You are not authorized to do this action.'
-                ]);
+                ], 403);
             }
             $fields = $request->validate([
                 'first_name' => 'required|alpha|max:15',
@@ -108,7 +106,7 @@ class UserController extends Controller
 
             }
 
-            return new UserResource($user);
+            return (new UserResource($user))->response()->setStatusCode(200);
         } else {
             return $result;
         }
@@ -124,9 +122,8 @@ class UserController extends Controller
     public function destroy($id) {
         if (! Gate::allows('delete-user')) {
             return response()->json([
-                'code' => 403,
                 'message' => 'You don\'t have permission to access this resource'
-            ]);
+            ], 403);
         }
         $result = $this->doesUserExist($id);
         if (gettype($result) == 'boolean') {
@@ -136,9 +133,8 @@ class UserController extends Controller
             }
             User::destroy($id);
             return response()->json([
-                'code' => 200,
                 'message' =>'User deleted successfully'
-            ]);
+            ], 200);
         }
 
         return $result;
@@ -157,7 +153,7 @@ class UserController extends Controller
         $message = $response->current();
 
         if ($message->getStatus() == 0) {
-            return response()->json(['message' => 'The message was sent successfully']);
+            return response()->json(['message' => 'The message was sent successfully'], 200);
         } else {
             return response()->json(['message' => 'The message failed with status:'.$message->getStatus()]);
         }
@@ -166,9 +162,8 @@ class UserController extends Controller
     public function banUser($id) {
         if (! Gate::allows('ban-user')) {
             return response()->json([
-                'code' => 403,
                 'message' => 'You don\'t have permission to access this resource'
-            ]);
+            ], 403);
         }
         $result = $this->doesUserExist($id);
         if (gettype($result) == 'boolean') {
@@ -178,9 +173,8 @@ class UserController extends Controller
             ]);
 
             return response()->json([
-                'code' => 200,
                 'message' => $user->username.' is successfully banned'
-            ]);
+            ], 200);
         }
 
         return $result;
@@ -192,9 +186,8 @@ class UserController extends Controller
         $user = User::find($id);
         if(!isset($user)) {
             return response()->json([
-                'code' =>404,
                 'message' => 'Not Found'
-            ]);
+            ], 404);
         }
         else
             return true;

@@ -15,9 +15,8 @@ class AdminController extends Controller
     public function createUser(Request $request) {
         if (! Gate::allows('create-user')) {
             return response()->json([
-                'code' => 403,
                 'message' => 'You don\'t have permission to access this resource.'
-            ])->setStatusCode(403);
+            ], 403);
         }
         $fields = $request->validate([
             'first_name' => 'required|alpha|max:15',
@@ -51,20 +50,19 @@ class AdminController extends Controller
             'role_id' => $fields['role_id']
         ]);
 
-        return new UserResource($user);
+        return (new UserResource($user))->response()->setStatusCode(200);
 
     }
 
     public function getAdmins() {
         if (! Gate::allows('get-admins')) {
             return response()->json([
-                'code' => 403,
                 'message' => 'You don\'t have permission to access this resource'
-            ]);
+            ], 403);
         }
         $admins = User::where('is_admin', 1)->get();
 
-        return UserResource::collection($admins);
+        return UserResource::collection($admins)->response()->setStatusCode(200);
     }
 
 

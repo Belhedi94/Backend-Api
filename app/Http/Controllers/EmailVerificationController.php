@@ -15,8 +15,7 @@ class EmailVerificationController extends Controller
         $user = User::find($request->route('id'));
 
         if ($user->hasVerifiedEmail()) {
-            //return redirect(env('FRONT_URL') . '/email/verify/already-success');
-            return response()->json(['message' => 'Email already verified']);
+            return response()->json(['message' => 'Email already verified'], 200);
         }
 
         if ($user->markEmailAsVerified()) {
@@ -24,6 +23,6 @@ class EmailVerificationController extends Controller
         }
 
         //return redirect(env('FRONT_URL') . '/email/verify/success');
-        return response()->json (['message' => 'Email successfully verified']);
+        return response()->json (['message' => 'Email successfully verified'], 200);
     }
 }

@@ -18,9 +18,8 @@ class MustBeAdministrator
     {
         if (!auth()->user()->is_admin) {
             return response()->json([
-                'code' => 403,
                 'message' => 'You don\'t have permission to access / on this server'
-            ]);
+            ], 403);
         }
         return $next($request);
     }
