@@ -45,7 +45,7 @@ Route::middleware(['auth:sanctum', 'account.activated'])->group(function () {
     Route::middleware('admin')->group(function() {
         Route::post('admin/create', [AdminController::class, 'createUser']);
         Route::get('admin/list', [AdminController::class, 'getAdmins']);
-        Route::patch('admin/ban/{id}', [UserController::class, 'banUser']);
+        Route::patch('admin/ban/{id}', [AdminController::class, 'banUser']);
         Route::get('users', [UserController::class, 'index']);
         Route::delete('/users/{id}', [UserController::class, 'destroy']);
     });

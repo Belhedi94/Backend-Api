@@ -26,7 +26,7 @@ class UserSeeder extends Seeder
             'sexe' => 'M',
             'phone' => '41056519',
             'birthdate' => Carbon::parse('1994-04-15'),
-            'photo' => 'my-image.png'
+            'avatar' => 'my-image.png'
         ]);
     }
 }

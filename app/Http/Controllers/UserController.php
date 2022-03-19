@@ -73,7 +73,7 @@ class UserController extends Controller
                         ->numbers()
                         ->symbols()->uncompromised()],
                 'username' => ['required','min:5','max:15', new Username,  Rule::unique('users')->ignore($id)],
-                'photo' => 'image|mimes:jpg,jpeg,png',
+                'avatar' => 'image|mimes:jpg,jpeg,png',
                 'sexe' => ['required', Rule::in(['M', 'F'])],
                 'phone' => 'required|numeric',
                 'birthdate' => 'required|date',
@@ -83,26 +83,26 @@ class UserController extends Controller
             $fields['password'] = bcrypt($fields['password']);
 
             $user = User::find($id);
-            $oldPhoto = $user->photo;
+            $oldAvatar = $user->avatar;
             $user->update($fields);
 
-            if($request->hasFile('photo')){
+            if($request->hasFile('avatar')){
                 // Get filename with the extension
-                $filenameWithExt = $request->file('photo')->getClientOriginalName();
+                $filenameWithExt = $request->file('avatar')->getClientOriginalName();
                 // Get just filename
                 $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
                 // Get just ext
-                $extension = $request->file('photo')->getClientOriginalExtension();
+                $extension = $request->file('avatar')->getClientOriginalExtension();
                 // Filename to store
                 $fileNameToStore= $filename.'_'.time().'.'.$extension;
                 // Upload Image
-                $path = $request->file('photo')->storeAs('public/photos', $fileNameToStore);
+                $path = $request->file('avatar')->storeAs('public/avatars', $fileNameToStore);
 
-                if ($user->photo != 'no-image.png') {
-                    Storage::delete('public/photos/'. $oldPhoto);
+                if ($user->avatar != 'no-image.png') {
+                    Storage::delete('public/avatars/'. $oldAvatar);
                 }
 
-                $user->update(['photo' => $fileNameToStore]);
+                $user->update(['avatar' => $fileNameToStore]);
 
             }
 
@@ -127,9 +127,9 @@ class UserController extends Controller
         }
         $result = $this->doesUserExist($id);
         if (gettype($result) == 'boolean') {
-            $fileName = User::find($id)->photo;
+            $fileName = User::find($id)->avatar;
             if ($fileName != 'no-image.png') {
-                Storage::delete('public/photos/'.$fileName);
+                Storage::delete('public/avatars/'.$fileName);
             }
             User::destroy($id);
             return response()->json([
@@ -159,27 +159,6 @@ class UserController extends Controller
         }
     }
 
-    public function banUser($id) {
-        if (! Gate::allows('ban-user')) {
-            return response()->json([
-                'message' => 'You don\'t have permission to access this resource'
-            ], 403);
-        }
-        $result = $this->doesUserExist($id);
-        if (gettype($result) == 'boolean') {
-            $user = User::findOrFail($id);
-            $user->update([
-                'is_banned' => 1
-            ]);
-
-            return response()->json([
-                'message' => $user->username.' is successfully banned'
-            ], 200);
-        }
-
-        return $result;
-
-    }
 
     public function doesUserExist($id) {
 

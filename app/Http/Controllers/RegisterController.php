@@ -24,24 +24,24 @@ class RegisterController extends Controller
                     ->numbers()
                     ->symbols()->uncompromised()],
             'username' => ['required','unique:users,username','min:5','max:15', new Username],
-            'photo' => 'image|mimes:jpg,jpeg,png',
+            'avatar' => 'image|mimes:jpg,jpeg,png',
             'sexe' => ['required', Rule::in(['M', 'F'])],
             'phone' => 'required|numeric',
             'birthdate' => 'required|date'
         ]);
 
         // Handle File Upload
-        if($request->hasFile('photo')){
+        if($request->hasFile('avatar')){
             // Get filename with the extension
-            $filenameWithExt = $request->file('photo')->getClientOriginalName();
+            $filenameWithExt = $request->file('avatar')->getClientOriginalName();
             // Get just filename
             $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
             // Get just ext
-            $extension = $request->file('photo')->getClientOriginalExtension();
+            $extension = $request->file('avatar')->getClientOriginalExtension();
             // Filename to store
             $fileNameToStore= $filename.'_'.time().'.'.$extension;
             // Upload Image
-            $path = $request->file('photo')->storeAs('public/photos', $fileNameToStore);
+            $path = $request->file('avatar')->storeAs('public/avatars', $fileNameToStore);
 
 
         } else {
@@ -56,7 +56,7 @@ class RegisterController extends Controller
             'username' => $fields['username'],
             'is_admin' => false,
             'sexe' => $fields['sexe'],
-            'photo' => $fileNameToStore,
+            'avatar' => $fileNameToStore,
             'phone' => $fields['phone'],
             'birthdate' => $fields['birthdate'],
             'role_id' => 4

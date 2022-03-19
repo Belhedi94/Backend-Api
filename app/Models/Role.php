@@ -13,7 +13,8 @@ class Role extends Model
 
      const IS_SUPER_ADMIN = 1;
      const IS_ADMIN = 2;
-     const IS_USER = 3;
+     const IS_MANAGER = 3;
+     const IS_USER = 4;
 
      public function users() {
          return $this->hasMany(User::class);

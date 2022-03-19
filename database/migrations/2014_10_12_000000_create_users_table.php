@@ -25,7 +25,7 @@ class CreateUsersTable extends Migration
             $table->integer('role_id');
             $table->boolean('is_banned')->default(false);
             $table->char('sexe');
-            $table->string('photo')->default('my_image.png');
+            $table->string('avatar')->default('my_image.png');
             $table->string('phone')->nullable();
             $table->date('birthdate')->nullable();
             $table->rememberToken();

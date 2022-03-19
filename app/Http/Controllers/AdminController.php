@@ -42,7 +42,7 @@ class AdminController extends Controller
             'email' => $fields['email'],
             'password' => bcrypt($fields['password']),
             'username' => $fields['username'],
-            'photo' => 'no-image.png',
+            'avatar' => 'no-image.png',
             'sexe' => $fields['sexe'],
             'phone' => $fields['phone'],
             'birthdate' => $fields['birthdate'],
@@ -63,6 +63,29 @@ class AdminController extends Controller
         $admins = User::where('is_admin', 1)->get();
 
         return UserResource::collection($admins)->response()->setStatusCode(200);
+    }
+
+    public function banUser($id) {
+        if (! Gate::allows('ban-user')) {
+            return response()->json([
+                'message' => 'You don\'t have permission to access this resource'
+            ], 403);
+        }
+        $userController = new UserController();
+        $result = $userController->doesUserExist($id);
+        if (gettype($result) == 'boolean') {
+            $user = User::findOrFail($id);
+            $user->update([
+                'is_banned' => 1
+            ]);
+
+            return response()->json([
+                'message' => $user->username.' is successfully banned'
+            ], 200);
+        }
+
+        return $result;
+
     }
 
 
