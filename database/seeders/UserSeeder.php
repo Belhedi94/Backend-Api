@@ -18,15 +18,16 @@ class UserSeeder extends Seeder
             'first_name' => 'Rafaa',
             'last_name' => 'Belhedi',
             'email' => 'rafaa.b@gmail.com',
-            'password' => bcrypt('Rafaa94$'),
             'username' => 'Belhedi',
-            'is_admin' => true,
-            'role_id' => 1,
-            'is_banned' => false,
+            'password' => bcrypt('Rafaa94$'),
+            'birthdate' => Carbon::parse('1994-04-15'),
             'sexe' => 'M',
             'phone' => '41056519',
-            'birthdate' => Carbon::parse('1994-04-15'),
-            'avatar' => 'my-image.png'
+            'avatar' => 'my-image.png',
+            'is_admin' => true,
+            'is_banned' => false,
+            'role_id' => 1,
+            'country_id' => 227
         ]);
     }
 }

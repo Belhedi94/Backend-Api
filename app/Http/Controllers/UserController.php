@@ -9,7 +9,8 @@ use App\Models\User;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Storage;
-use App\Rules\Username;
+use App\Rules\UsernameRule;
+use App\Rules\CountryRule;
 
 class UserController extends Controller
 {
@@ -38,7 +39,7 @@ class UserController extends Controller
     {
         $result = $this->doesUserExist($id);
         if (gettype($result) == 'boolean') {
-            return (new UserResource(User::findOrfail($id)))->response()->setStatusCode();
+            return (new UserResource(User::findOrfail($id)))->response()->setStatusCode(200);
         }
 
         return $result;
@@ -66,18 +67,19 @@ class UserController extends Controller
                 'first_name' => 'required|alpha|max:15',
                 'last_name' => 'required|alpha|max:15',
                 'email' => ['required', 'email', Rule::unique('users')->ignore($id)],
+                'username' => ['required','min:5','max:15', new UsernameRule,  Rule::unique('users')->ignore($id)],
                 'password' => ['required', 'confirmed',
                     Password::min(8)
                         ->letters()
                         ->mixedCase()
                         ->numbers()
                         ->symbols()->uncompromised()],
-                'username' => ['required','min:5','max:15', new Username,  Rule::unique('users')->ignore($id)],
-                'avatar' => 'image|mimes:jpg,jpeg,png',
+                'birthdate' => 'required|date',
                 'sexe' => ['required', Rule::in(['M', 'F'])],
                 'phone' => 'required|numeric',
-                'birthdate' => 'required|date',
-                'role_id' => Rule::in([1, 2, 3, 4])
+                'avatar' => 'image|mimes:jpg,jpeg,png',
+                'role_id' => Rule::in([1, 2, 3, 4]),
+                'country_id' => ['required', new CountryRule()]
             ]);
 
             $fields['password'] = bcrypt($fields['password']);

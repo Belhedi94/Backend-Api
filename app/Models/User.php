@@ -24,15 +24,16 @@ class User extends Authenticatable implements MustVerifyEmail
         'first_name',
         'last_name',
         'email',
-        'password',
         'username',
-        'is_admin',
-        'role_id',
-        'is_banned',
+        'password',
+        'birthdate',
         'sexe',
         'phone',
-        'birthdate',
-        'avatar'
+        'avatar',
+        'is_admin',
+        'is_banned',
+        'role_id',
+        'country_id',
     ];
 
     /**
@@ -63,6 +64,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function role() {
         return $this->belongsTo(Role::class);
+    }
+
+    public function country() {
+        return $this->belongsTo(Country::class);
     }
 
 }

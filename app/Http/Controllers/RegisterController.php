@@ -6,28 +6,30 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Validation\Rules\Password;
-use App\Rules\Username;
+use App\Rules\UsernameRule;
+use App\Rules\CountryRule;
 use Illuminate\Validation\Rule;
+
 
 class RegisterController extends Controller
 {
     public function register(Request $request) {
-
         $fields = $request->validate([
             'first_name' => 'required|alpha|max:15',
             'last_name' => 'required|alpha|max:15',
             'email' => 'required|unique:users,email|email',
+            'username' => ['required','unique:users,username','min:5','max:15', new UsernameRule],
             'password' => ['required', 'confirmed',
                 Password::min(8)
                     ->letters()
                     ->mixedCase()
                     ->numbers()
                     ->symbols()->uncompromised()],
-            'username' => ['required','unique:users,username','min:5','max:15', new Username],
-            'avatar' => 'image|mimes:jpg,jpeg,png',
+            'birthdate' => 'required|date',
             'sexe' => ['required', Rule::in(['M', 'F'])],
             'phone' => 'required|numeric',
-            'birthdate' => 'required|date'
+            'avatar' => 'image|mimes:jpg,jpeg,png',
+            'country_id' => ['required', new CountryRule()]
         ]);
 
         // Handle File Upload
@@ -52,14 +54,16 @@ class RegisterController extends Controller
             'first_name' => $fields['first_name'],
             'last_name' => $fields['last_name'],
             'email' => $fields['email'],
-            'password' => bcrypt($fields['password']),
             'username' => $fields['username'],
-            'is_admin' => false,
-            'sexe' => $fields['sexe'],
-            'avatar' => $fileNameToStore,
-            'phone' => $fields['phone'],
+            'password' => bcrypt($fields['password']),
             'birthdate' => $fields['birthdate'],
-            'role_id' => 4
+            'sexe' => $fields['sexe'],
+            'phone' => $fields['phone'],
+            'avatar' => $fileNameToStore,
+            'is_admin' => false,
+            'role_id' => 4,
+            'country_id' => $fields['country_id']
+
         ]);
 
         event(new Registered($user));

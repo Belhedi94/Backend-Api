@@ -18,17 +18,18 @@ class CreateUsersTable extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
             $table->string('username')->unique();
-            $table->boolean('is_admin')->default(false);
-            $table->integer('role_id');
-            $table->boolean('is_banned')->default(false);
-            $table->char('sexe');
-            $table->string('avatar')->default('my_image.png');
-            $table->string('phone')->nullable();
+            $table->string('password');
             $table->date('birthdate')->nullable();
+            $table->char('sexe');
+            $table->string('phone')->nullable();
+            $table->string('avatar')->default('my_image.png');
+            $table->boolean('is_admin')->default(false);
+            $table->boolean('is_banned')->default(false);
+            $table->integer('role_id');
+            $table->integer('country_id');
             $table->rememberToken();
+            $table->timestamp('email_verified_at')->nullable();
             $table->timestamps();
         });
     }
