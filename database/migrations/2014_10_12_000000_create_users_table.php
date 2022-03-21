@@ -22,7 +22,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->date('birthdate')->nullable();
             $table->char('sexe');
-            $table->string('phone')->nullable();
+            $table->string('mobile_number')->unique()->nullable();
             $table->string('avatar')->default('my_image.png');
             $table->boolean('is_admin')->default(false);
             $table->boolean('is_banned')->default(false);

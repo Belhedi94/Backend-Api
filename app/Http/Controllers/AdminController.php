@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Http\Helpers;
 use Illuminate\Validation\Rules\Password;
 use App\Rules\UsernameRule;
 use App\Rules\CountryRule;
+use App\Rules\MobileNumberRule;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Gate;
 
@@ -19,6 +21,7 @@ class AdminController extends Controller
                 'message' => 'You don\'t have permission to access this resource.'
             ], 403);
         }
+        $request['mobile_number'] = Helpers::normalizeMobileNumber($request->mobile_number);
         $fields = $request->validate([
             'first_name' => 'required|alpha|max:15',
             'last_name' => 'required|alpha|max:15',
@@ -32,9 +35,9 @@ class AdminController extends Controller
                     ->symbols()->uncompromised()],
             'birthdate' => 'required|date',
             'sexe' => ['required', Rule::in(['M', 'F'])],
-            'phone' => 'required|numeric',
+            'mobile_number' => ['required', new MobileNumberRule, 'unique:users,mobile_number'],
             'role_id' => Rule::in([1, 2, 3, 4]),
-            'country_id' => ['required', new CountryRule()]
+            'country_id' => ['required', new CountryRule]
         ]);
 
         $user = User::create([
@@ -45,7 +48,8 @@ class AdminController extends Controller
             'password' => bcrypt($fields['password']),
             'birthdate' => $fields['birthdate'],
             'sexe' => $fields['sexe'],
-            'phone' => $fields['phone'],
+            //should be modified
+            'mobile_number' => $fields['mobile_number'],
             'avatar' => 'no-image.png',
             'is_admin' => true,
             'role_id' => $fields['role_id'],

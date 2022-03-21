@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -22,7 +23,7 @@ class LoginController extends Controller
             $user = User::where($loginType, $fields['login'])->first();
             $token = $user->createToken('myapptoken')->plainTextToken;
             $response = [
-                'user' => $user,
+                'user' => new UserResource($user),
                 'token' => $token
             ];
 

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Helpers;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Validation\Rules\Password;
 use App\Rules\UsernameRule;
+use App\Rules\MobileNumberRule;
 use App\Rules\CountryRule;
 use Illuminate\Validation\Rule;
 
@@ -14,6 +16,7 @@ use Illuminate\Validation\Rule;
 class RegisterController extends Controller
 {
     public function register(Request $request) {
+        $request['mobile_number'] = Helpers::normalizeMobileNumber($request->mobile_number);
         $fields = $request->validate([
             'first_name' => 'required|alpha|max:15',
             'last_name' => 'required|alpha|max:15',
@@ -27,7 +30,7 @@ class RegisterController extends Controller
                     ->symbols()->uncompromised()],
             'birthdate' => 'required|date',
             'sexe' => ['required', Rule::in(['M', 'F'])],
-            'phone' => 'required|numeric',
+            'mobile_number' => ['required', new MobileNumberRule, 'unique:users,mobile_number'],
             'avatar' => 'image|mimes:jpg,jpeg,png',
             'country_id' => ['required', new CountryRule()]
         ]);
@@ -58,7 +61,7 @@ class RegisterController extends Controller
             'password' => bcrypt($fields['password']),
             'birthdate' => $fields['birthdate'],
             'sexe' => $fields['sexe'],
-            'phone' => $fields['phone'],
+            'mobile_number' => $fields['mobile_number'],
             'avatar' => $fileNameToStore,
             'is_admin' => false,
             'role_id' => 4,

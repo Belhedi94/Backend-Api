@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
             'password' => bcrypt('Rafaa94$'),
             'birthdate' => Carbon::parse('1994-04-15'),
             'sexe' => 'M',
-            'phone' => '41056519',
+            'mobile_number' => '21641056519',
             'avatar' => 'my-image.png',
             'is_admin' => true,
             'is_banned' => false,

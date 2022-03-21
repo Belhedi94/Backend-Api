@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Helpers;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Gate;
@@ -10,6 +11,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Storage;
 use App\Rules\UsernameRule;
+use App\Rules\MobileNumberRule;
 use App\Rules\CountryRule;
 
 class UserController extends Controller
@@ -63,6 +65,8 @@ class UserController extends Controller
                     'message' => 'You are not authorized to do this action.'
                 ], 403);
             }
+
+            $request['mobile_number'] = Helpers::normalizeMobileNumber($request->mobile_number);
             $fields = $request->validate([
                 'first_name' => 'required|alpha|max:15',
                 'last_name' => 'required|alpha|max:15',
@@ -76,7 +80,7 @@ class UserController extends Controller
                         ->symbols()->uncompromised()],
                 'birthdate' => 'required|date',
                 'sexe' => ['required', Rule::in(['M', 'F'])],
-                'phone' => 'required|numeric',
+                'mobile_number' => ['required', new MobileNumberRule, Rule::unique('users')->ignore($id)],
                 'avatar' => 'image|mimes:jpg,jpeg,png',
                 'role_id' => Rule::in([1, 2, 3, 4]),
                 'country_id' => ['required', new CountryRule()]
@@ -105,7 +109,6 @@ class UserController extends Controller
                 }
 
                 $user->update(['avatar' => $fileNameToStore]);
-
             }
 
             return (new UserResource($user))->response()->setStatusCode(200);
@@ -173,4 +176,5 @@ class UserController extends Controller
         else
             return true;
     }
+
 }
