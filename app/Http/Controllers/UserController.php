@@ -39,7 +39,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $result = $this->doesUserExist($id);
+        $result = Helpers::doesUserExist($id);
         if (gettype($result) == 'boolean') {
             return (new UserResource(User::findOrfail($id)))->response()->setStatusCode(200);
         }
@@ -58,7 +58,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $result = $this->doesUserExist($id);
+        $result = Helpers::doesUserExist($id);
         if (gettype($result) == 'boolean') {
             if (! Gate::allows('update-user', $id)) {
                 return response()->json([
@@ -78,8 +78,8 @@ class UserController extends Controller
                         ->mixedCase()
                         ->numbers()
                         ->symbols()->uncompromised()],
-                'birthdate' => 'required|date',
-                'sexe' => ['required', Rule::in(['M', 'F'])],
+                'birthday' => 'required|date',
+                'sex' => ['required', Rule::in(['M', 'F'])],
                 'mobile_number' => ['required', new MobileNumberRule, Rule::unique('users')->ignore($id)],
                 'avatar' => 'image|mimes:jpg,jpeg,png',
                 'role_id' => Rule::in([1, 2, 3, 4]),
@@ -130,7 +130,7 @@ class UserController extends Controller
                 'message' => 'You don\'t have permission to access this resource'
             ], 403);
         }
-        $result = $this->doesUserExist($id);
+        $result = Helpers::doesUserExist($id);
         if (gettype($result) == 'boolean') {
             $fileName = User::find($id)->avatar;
             if ($fileName != 'no-image.png') {
@@ -162,19 +162,6 @@ class UserController extends Controller
         } else {
             return response()->json(['message' => 'The message failed with status:'.$message->getStatus()]);
         }
-    }
-
-
-    public function doesUserExist($id) {
-
-        $user = User::find($id);
-        if(!isset($user)) {
-            return response()->json([
-                'message' => 'Not Found'
-            ], 404);
-        }
-        else
-            return true;
     }
 
 }

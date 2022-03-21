@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use App\Http\Helpers;
 use App\Models\User;
@@ -28,8 +29,8 @@ class RegisterController extends Controller
                     ->mixedCase()
                     ->numbers()
                     ->symbols()->uncompromised()],
-            'birthdate' => 'required|date',
-            'sexe' => ['required', Rule::in(['M', 'F'])],
+            'birthday' => 'required|date',
+            'sex' => ['required', Rule::in(['M', 'F'])],
             'mobile_number' => ['required', new MobileNumberRule, 'unique:users,mobile_number'],
             'avatar' => 'image|mimes:jpg,jpeg,png',
             'country_id' => ['required', new CountryRule()]
@@ -59,8 +60,8 @@ class RegisterController extends Controller
             'email' => $fields['email'],
             'username' => $fields['username'],
             'password' => bcrypt($fields['password']),
-            'birthdate' => $fields['birthdate'],
-            'sexe' => $fields['sexe'],
+            'birthday' => $fields['birthday'],
+            'sex' => $fields['sex'],
             'mobile_number' => $fields['mobile_number'],
             'avatar' => $fileNameToStore,
             'is_admin' => false,
@@ -74,7 +75,7 @@ class RegisterController extends Controller
         $token = $user->createToken('myapptoken')->plainTextToken;
 
         $response = [
-            'user' => $user,
+            'user' => new UserResource($user),
             'token' => $token
         ];
 

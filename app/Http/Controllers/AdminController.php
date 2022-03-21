@@ -33,8 +33,8 @@ class AdminController extends Controller
                     ->mixedCase()
                     ->numbers()
                     ->symbols()->uncompromised()],
-            'birthdate' => 'required|date',
-            'sexe' => ['required', Rule::in(['M', 'F'])],
+            'birthday' => 'required|date',
+            'sex' => ['required', Rule::in(['M', 'F'])],
             'mobile_number' => ['required', new MobileNumberRule, 'unique:users,mobile_number'],
             'role_id' => Rule::in([1, 2, 3, 4]),
             'country_id' => ['required', new CountryRule]
@@ -46,9 +46,8 @@ class AdminController extends Controller
             'email' => $fields['email'],
             'username' => $fields['username'],
             'password' => bcrypt($fields['password']),
-            'birthdate' => $fields['birthdate'],
-            'sexe' => $fields['sexe'],
-            //should be modified
+            'birthday' => $fields['birthday'],
+            'sex' => $fields['sex'],
             'mobile_number' => $fields['mobile_number'],
             'avatar' => 'no-image.png',
             'is_admin' => true,

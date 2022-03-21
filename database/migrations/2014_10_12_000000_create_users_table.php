@@ -20,8 +20,8 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->string('username')->unique();
             $table->string('password');
-            $table->date('birthdate')->nullable();
-            $table->char('sexe');
+            $table->date('birthday')->nullable();
+            $table->char('sex');
             $table->string('mobile_number')->unique()->nullable();
             $table->string('avatar')->default('my_image.png');
             $table->boolean('is_admin')->default(false);
