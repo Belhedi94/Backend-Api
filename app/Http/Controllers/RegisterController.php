@@ -53,7 +53,7 @@ class RegisterController extends Controller
         } else {
             $fileNameToStore = 'no-image.jpg';
         }
-
+        $role = 4;
         $user = User::create([
             'first_name' => $fields['first_name'],
             'last_name' => $fields['last_name'],
@@ -65,8 +65,9 @@ class RegisterController extends Controller
             'mobile_number' => $fields['mobile_number'],
             'avatar' => $fileNameToStore,
             'is_admin' => false,
-            'role_id' => 4,
-            'country_id' => $fields['country_id']
+            'role_id' => $role,
+            'country_id' => $fields['country_id'],
+            'is_active' => true
 
         ]);
 

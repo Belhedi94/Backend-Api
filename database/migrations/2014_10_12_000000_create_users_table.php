@@ -25,7 +25,7 @@ class CreateUsersTable extends Migration
             $table->string('mobile_number')->unique()->nullable();
             $table->string('avatar')->default('my_image.png');
             $table->boolean('is_admin')->default(false);
-            $table->boolean('is_banned')->default(false);
+            $table->boolean('is_active')->default(true);
             $table->integer('role_id');
             $table->integer('country_id');
             $table->rememberToken();

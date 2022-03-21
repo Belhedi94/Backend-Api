@@ -27,7 +27,7 @@ class UserResource extends JsonResource
             'country' => $this->country->name,
             'role' => $this->role->name,
             'is_admin' => $this->is_admin,
-            'is_banned' => $this->is_banned,
+            'is_active' => $this->is_active,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

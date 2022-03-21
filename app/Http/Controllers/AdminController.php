@@ -76,12 +76,11 @@ class AdminController extends Controller
                 'message' => 'You don\'t have permission to access this resource'
             ], 403);
         }
-        $userController = new UserController();
-        $result = $userController->doesUserExist($id);
+        $result = Helpers::doesUserExist($id);
         if (gettype($result) == 'boolean') {
             $user = User::findOrFail($id);
             $user->update([
-                'is_banned' => 1
+                'is_active' => 0
             ]);
 
             return response()->json([
@@ -90,6 +89,32 @@ class AdminController extends Controller
         }
 
         return $result;
+
+    }
+
+    public function getBannedUsers() {
+        if (! Gate::allows('get-banned-users')) {
+            return response()->json([
+                'message' => 'You don\'t have permission to access this resource'
+            ], 403);
+        }
+
+        $bannedUsers = User::where('is_active', 0)->get();
+
+        return UserResource::collection($bannedUsers)->response()->setStatusCode(200);
+
+    }
+
+    public function getActiveUsers() {
+        if (! Gate::allows('get-active-users')) {
+            return response()->json([
+                'message' => 'You don\'t have permission to access this resource'
+            ], 403);
+        }
+
+        $activeUsers = User::where('is_active', 1)->get();
+
+        return UserResource::collection($activeUsers)->response()->setStatusCode(200);
 
     }
 

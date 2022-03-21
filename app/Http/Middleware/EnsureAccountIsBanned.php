@@ -16,11 +16,10 @@ class EnsureAccountIsBanned
      */
     public function handle(Request $request, Closure $next)
     {
-        if (auth()->user()->is_banned)
+        if (! auth()->user()->is_active)
             return response()->json([
-                'message' => 'Unauthorized',
-                'error' => 'Your account is banned.'
-            ]);
+                'message' => 'Unauthorized, your account is banned.'
+            ], 403);
         return $next($request);
     }
 }

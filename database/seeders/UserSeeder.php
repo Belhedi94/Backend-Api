@@ -25,7 +25,7 @@ class UserSeeder extends Seeder
             'mobile_number' => '21641056519',
             'avatar' => 'my-image.png',
             'is_admin' => true,
-            'is_banned' => false,
+            'is_active' => true,
             'role_id' => 1,
             'country_id' => 227
         ]);

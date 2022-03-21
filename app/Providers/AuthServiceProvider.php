@@ -46,6 +46,11 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('get_admins', function () {
             return auth()->user()->is_admin == true;
         });
+        Gate::define('get-banned-users', function () {
+            return auth()->user()->is_admin == true;
+        });Gate::define('get-active-users', function () {
+            return auth()->user()->is_admin == true;
+        });
 
 
         VerifyEmail::toMailUsing(function ($notifiable, $url) {
