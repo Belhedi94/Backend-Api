@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PostsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -50,6 +51,12 @@ Route::middleware(['auth:sanctum', 'account.activated'])->group(function () {
         Route::get('users', [UserController::class, 'index']);
         Route::delete('/users/{id}', [UserController::class, 'destroy']);
     });
+
+    Route::get('posts', [PostsController::class, 'index']);
+    Route::get('posts/{post}', [PostsController::class, 'show']);
+    Route::post('posts', [PostsController::class, 'store']);
+    Route::post('posts/{post}', [PostsController::class, 'update']);
+    Route::delete('/posts/{post}', [PostsController::class, 'destroy']);
 
     // Resend link to verify email
     Route::post('/email/verify/resend', function (Request $request) {

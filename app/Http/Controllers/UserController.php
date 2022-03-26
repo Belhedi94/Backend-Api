@@ -45,7 +45,6 @@ class UserController extends Controller
         }
 
         return $result;
-
     }
 
 
@@ -90,7 +89,6 @@ class UserController extends Controller
 
             $user = User::find($id);
             $oldAvatar = $user->avatar;
-            $user->update($fields);
 
             if($request->hasFile('avatar')){
                 // Get filename with the extension
@@ -108,14 +106,14 @@ class UserController extends Controller
                     Storage::delete('public/avatars/'. $oldAvatar);
                 }
 
-                $user->update(['avatar' => $fileNameToStore]);
+                $fields['avatar'] = $fileNameToStore;
             }
+            $user->update($fields);
 
             return (new UserResource($user))->response()->setStatusCode(200);
-        } else {
-            return $result;
-        }
+        } else
 
+            return $result;
     }
 
     /**

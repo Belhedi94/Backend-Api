@@ -70,4 +70,12 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Country::class);
     }
 
+    public function isAdministrator() {
+        return $this->is_admin;
+    }
+
+    public function posts() {
+        return $this->hasMany(Post::class);
+    }
+
 }

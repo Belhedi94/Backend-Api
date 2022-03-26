@@ -7,6 +7,7 @@
  */
 
 namespace App\Http;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 
@@ -27,6 +28,13 @@ class Helpers
         }
         else
             return true;
+    }
+
+    public static function doesPostExist($postID) {
+
+        $post = Post::find($postID);
+        if(isset($post))
+           return $post;
     }
 
 }
