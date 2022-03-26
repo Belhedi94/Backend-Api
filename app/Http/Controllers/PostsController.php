@@ -24,17 +24,9 @@ class PostsController extends Controller
         ]);
 
         if($request->hasFile('cover')){
-            // Get filename with the extension
-            $filenameWithExt = $request->file('cover')->getClientOriginalName();
-            // Get just filename
-            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-            // Get just ext
-            $extension = $request->file('cover')->getClientOriginalExtension();
-            // Filename to store
-            $fileNameToStore= $filename.'_'.time().'.'.$extension;
-            // Upload Image
-            $path = $request->file('cover')->storeAs('public/covers', $fileNameToStore);
-
+            $file = $request->file('cover');
+            $folderName = 'covers';
+            $fileNameToStore = Helpers::uploadImage($file, $folderName);
         } else
              $fileNameToStore = 'no-image.jpg';
 
@@ -51,7 +43,7 @@ class PostsController extends Controller
 
     public function show($id)
     {
-        $post = Helpers::doesPostExist($id);
+        $post = Helpers::doesItExist(Post::class, $id);
         if ($post) {
             return (new PostResource(Post::findOrfail($id)))->response()->setStatusCode(200);
         }
@@ -62,7 +54,7 @@ class PostsController extends Controller
     }
 
     public function update(Request $request, $id) {
-        $post = Helpers::doesPostExist($id);
+        $post = Helpers::doesItExist(Post::class, $id);
         if ($post) {
             if ($request->user()->can('update', $post)) {
                 $fields = $request->validate([
@@ -73,16 +65,9 @@ class PostsController extends Controller
 
                 if($request->hasFile('cover')){
                     $oldCoverImage = $post->cover;
-                    // Get filename with the extension
-                    $filenameWithExt = $request->file('cover')->getClientOriginalName();
-                    // Get just filename
-                    $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-                    // Get just ext
-                    $extension = $request->file('cover')->getClientOriginalExtension();
-                    // Filename to store
-                    $fileNameToStore= $filename.'_'.time().'.'.$extension;
-                    // Upload Image
-                    $path = $request->file('cover')->storeAs('public/covers', $fileNameToStore);
+                    $file = $request->file('cover');
+                    $folderName = 'covers';
+                    $fileNameToStore = Helpers::uploadImage($file, $folderName);
 
                     if ($post->cover != 'no-image.jpg')
                         Storage::delete('public/covers/'. $oldCoverImage);
@@ -97,15 +82,14 @@ class PostsController extends Controller
                     'message' => 'You are not authorized to do this action!'
                 ], 403);
 
-        } else
-
+        }
             return response()->json([
                 'message' => 'Page not Found!'
             ], 404);
     }
 
     public function destroy(Request $request, $id) {
-        $post = Helpers::doesPostExist($id);
+        $post = Helpers::doesItExist(Post::class, $id);
         if (isset($post)) {
             if ($request->user()->can('delete', $post)) {
                 $coverImage = $post->cover;

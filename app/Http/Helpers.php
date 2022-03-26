@@ -7,10 +7,6 @@
  */
 
 namespace App\Http;
-use App\Models\Post;
-use App\Models\User;
-use Illuminate\Support\Facades\Gate;
-
 
 class Helpers
 {
@@ -18,23 +14,20 @@ class Helpers
         return str_replace([' ', '.', '-', '(', ')', '+'], '', $mobileNumber);
     }
 
-    public static function doesUserExist($userID) {
-
-        $user = User::find($userID);
-        if(!isset($user)) {
-            return response()->json([
-                'message' => 'Page not Found'
-            ], 404);
-        }
-        else
-            return true;
+    public static function doesItExist($className, $id) {
+        $raw = $className::find($id);
+        if (isset($raw))
+            return $raw;
     }
 
-    public static function doesPostExist($postID) {
+    public static function uploadImage($file, $folderName) {
+        $filenameWithExt = $file->getClientOriginalName();
+        $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+        $extension = $file->getClientOriginalExtension();
+        $fileNameToStore= $filename.'_'.time().'.'.$extension;
+        $file->storeAs('public/'.$folderName, $fileNameToStore);
 
-        $post = Post::find($postID);
-        if(isset($post))
-           return $post;
+        return $fileNameToStore;
     }
 
 }

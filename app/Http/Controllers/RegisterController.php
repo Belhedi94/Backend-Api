@@ -36,23 +36,14 @@ class RegisterController extends Controller
             'country_id' => ['required', new CountryRule()]
         ]);
 
-        // Handle File Upload
         if($request->hasFile('avatar')){
-            // Get filename with the extension
-            $filenameWithExt = $request->file('avatar')->getClientOriginalName();
-            // Get just filename
-            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-            // Get just ext
-            $extension = $request->file('avatar')->getClientOriginalExtension();
-            // Filename to store
-            $fileNameToStore= $filename.'_'.time().'.'.$extension;
-            // Upload Image
-            $path = $request->file('avatar')->storeAs('public/avatars', $fileNameToStore);
-
-
-        } else {
+            $file = $request->file('avatar');
+            $folderName = 'avatars';
+            $fileNameToStore = Helpers::uploadImage($file, $folderName);
+            }
+        else
             $fileNameToStore = 'no-image.jpg';
-        }
+
         $role = 4;
         $user = User::create([
             'first_name' => $fields['first_name'],

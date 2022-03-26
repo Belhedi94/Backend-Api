@@ -39,12 +39,13 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $result = Helpers::doesUserExist($id);
-        if (gettype($result) == 'boolean') {
+        $user = Helpers::doesItExist(User::class, $id);
+        if ($user)
             return (new UserResource(User::findOrfail($id)))->response()->setStatusCode(200);
-        }
 
-        return $result;
+        return response()->json([
+            'message' => 'Page not Found!'
+        ], 404);
     }
 
 
@@ -57,8 +58,8 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $result = Helpers::doesUserExist($id);
-        if (gettype($result) == 'boolean') {
+        $user = Helpers::doesItExist(User::class, $id);
+        if ($user) {
             if (! Gate::allows('update-user', $id)) {
                 return response()->json([
                     'message' => 'You are not authorized to do this action.'
@@ -86,21 +87,12 @@ class UserController extends Controller
             ]);
 
             $fields['password'] = bcrypt($fields['password']);
-
-            $user = User::find($id);
-            $oldAvatar = $user->avatar;
-
             if($request->hasFile('avatar')){
-                // Get filename with the extension
-                $filenameWithExt = $request->file('avatar')->getClientOriginalName();
-                // Get just filename
-                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-                // Get just ext
-                $extension = $request->file('avatar')->getClientOriginalExtension();
-                // Filename to store
-                $fileNameToStore= $filename.'_'.time().'.'.$extension;
-                // Upload Image
-                $path = $request->file('avatar')->storeAs('public/avatars', $fileNameToStore);
+                $user = User::find($id);
+                $oldAvatar = $user->avatar;
+                $file = $request->file('avatar');
+                $folderName = 'avatars';
+                $fileNameToStore = Helpers::uploadImage($file, $folderName);
 
                 if ($user->avatar != 'no-image.png') {
                     Storage::delete('public/avatars/'. $oldAvatar);
@@ -111,9 +103,13 @@ class UserController extends Controller
             $user->update($fields);
 
             return (new UserResource($user))->response()->setStatusCode(200);
-        } else
+        }
 
-            return $result;
+        return response()->json([
+            'message' => 'Page not Found!'
+        ], 404);
+
+
     }
 
     /**
@@ -123,13 +119,13 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id) {
-        if (! Gate::allows('delete-user')) {
-            return response()->json([
-                'message' => 'You don\'t have permission to access this resource'
-            ], 403);
-        }
-        $result = Helpers::doesUserExist($id);
-        if (gettype($result) == 'boolean') {
+        $user = Helpers::doesItExist(User::class, $id);
+        if (isset($user)) {
+            if (! Gate::allows('delete-user')) {
+                return response()->json([
+                    'message' => 'You don\'t have permission to access this resource'
+                ], 403);
+            }
             $fileName = User::find($id)->avatar;
             if ($fileName != 'no-image.png') {
                 Storage::delete('public/avatars/'.$fileName);
@@ -140,7 +136,9 @@ class UserController extends Controller
             ], 200);
         }
 
-        return $result;
+        return response()->json([
+            'message' => 'Page not Found!'
+        ], 404);
 
     }
 
