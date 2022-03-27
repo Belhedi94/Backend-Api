@@ -28,30 +28,15 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        Gate::define('create-user', function () {
-            return auth()->user()->is_admin == true;
+        Gate::before(function ($user, $ability) {
+            if ($user->isAdministrator()) {
+                return true;
+            }
         });
+
         Gate::define('update-user', function ($user, $id) {
             return auth()->user()->id == $id;
         });
-        Gate::define('get-users', function () {
-            return auth()->user()->is_admin == true;
-        });
-        Gate::define('ban-user', function () {
-            return auth()->user()->is_admin == true;
-        });
-        Gate::define('delete-user', function () {
-            return auth()->user()->is_admin == true;
-        });
-        Gate::define('get_admins', function () {
-            return auth()->user()->is_admin == true;
-        });
-        Gate::define('get-banned-users', function () {
-            return auth()->user()->is_admin == true;
-        });Gate::define('get-active-users', function () {
-            return auth()->user()->is_admin == true;
-        });
-
 
         VerifyEmail::toMailUsing(function ($notifiable, $url) {
             return (new MailMessage)

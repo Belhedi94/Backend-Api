@@ -22,11 +22,11 @@ class PostsController extends Controller
         $fields = $request->validate([
             'title' => 'required|min:15|max:40',
             'body' => 'required|min:40|max:5000',
-            'cover' => 'image|mimes:jpg,jpeg,png'
+            'cover_image' => 'image|mimes:jpg,jpeg,png'
         ]);
 
-        if($request->hasFile('cover')){
-            $file = $request->file('cover');
+        if($request->hasFile('cover_image')){
+            $file = $request->file('cover_image');
             $folderName = 'covers';
             $fileNameToStore = Helpers::uploadImage($file, $folderName);
         } else
@@ -35,7 +35,7 @@ class PostsController extends Controller
         $post = Post::create([
             'title' => $fields['title'],
             'body' => $fields['body'],
-            'cover' => $fileNameToStore,
+            'cover_image' => $fileNameToStore,
             'user_id' => auth()->user()->id
         ]);
 
@@ -62,19 +62,19 @@ class PostsController extends Controller
                 $fields = $request->validate([
                     'title' => 'required|min:15|max:40',
                     'body' => 'required|min:40|max:5000',
-                    'cover' => 'image|mimes:jpg,jpeg,png'
+                    'cover_image' => 'image|mimes:jpg,jpeg,png'
                 ]);
 
-                if($request->hasFile('cover')){
-                    $oldCoverImage = $post->cover;
-                    $file = $request->file('cover');
+                if($request->hasFile('cover_image')){
+                    $oldCoverImage = $post->cover_image;
+                    $file = $request->file('cover_image');
                     $folderName = 'covers';
                     $fileNameToStore = Helpers::uploadImage($file, $folderName);
 
-                    if ($post->cover != 'no-image.jpg')
+                    if ($post->cover_image != 'no-image.jpg')
                         Storage::delete('public/covers/'. $oldCoverImage);
 
-                    $fields['cover'] = $fileNameToStore;
+                    $fields['cover_image'] = $fileNameToStore;
                 }
                 $post->update($fields);
 

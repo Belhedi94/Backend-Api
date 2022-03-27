@@ -25,11 +25,6 @@ class UserController extends Controller
      */
     public function index()
     {
-        if (! Gate::allows('get-users')) {
-            return response()->json([
-                'message' => ResponseMessages::FORBIDDEN
-            ], Response::HTTP_FORBIDDEN);
-        }
         return UserResource::collection(User::all())->response()->setStatusCode(200);
     }
 
@@ -123,12 +118,6 @@ class UserController extends Controller
     public function destroy($id) {
         $user = Helpers::doesItExist(User::class, $id);
         if (isset($user)) {
-            if (! Gate::allows('delete-user')) {
-                return response()->json([
-                    'message' => ResponseMessages::FORBIDDEN
-                ], Response::HTTP_FORBIDDEN);
-
-            }
             $fileName = User::find($id)->avatar;
             if ($fileName != 'no-image.png') {
                 Storage::delete('public/avatars/'.$fileName);

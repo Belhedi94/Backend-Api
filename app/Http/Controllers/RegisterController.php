@@ -33,7 +33,7 @@ class RegisterController extends Controller
             'sex' => ['required', Rule::in(['M', 'F'])],
             'mobile_number' => ['required', new MobileNumberRule, 'unique:users,mobile_number'],
             'avatar' => 'image|mimes:jpg,jpeg,png',
-            'country_id' => ['required', new CountryRule()]
+            'country_id' => ['required', new CountryRule]
         ]);
 
         if($request->hasFile('avatar')){

@@ -17,7 +17,7 @@ class PostSeeder extends Seeder
         Post::create([
             'title' => 'My first post',
             'body' => 'this is my body',
-            'cover' => 'cover.png',
+            'cover_image' => 'cover.png',
             'user_id' => '1',
         ]);
     }

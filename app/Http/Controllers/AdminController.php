@@ -12,17 +12,11 @@ use App\Rules\UsernameRule;
 use App\Rules\CountryRule;
 use App\Rules\MobileNumberRule;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 
 class AdminController extends Controller
 {
     public function createUser(Request $request) {
-        if (! Gate::allows('create-user')) {
-            return response()->json([
-                'message' => ResponseMessages::FORBIDDEN
-            ], Response::HTTP_FORBIDDEN);
-        }
         $request['mobile_number'] = Helpers::normalizeMobileNumber($request->mobile_number);
         $fields = $request->validate([
             'first_name' => 'required|alpha|max:15',
@@ -62,25 +56,14 @@ class AdminController extends Controller
     }
 
     public function getAdmins() {
-        if (! Gate::allows('get-admins')) {
-            return response()->json([
-                'message' => ResponseMessages::FORBIDDEN
-            ], Response::HTTP_FORBIDDEN);
-        }
         $admins = User::where('is_admin', 1)->get();
 
         return UserResource::collection($admins)->response()->setStatusCode(200);
     }
 
     public function banUser($id) {
-        if (! Gate::allows('ban-user')) {
-            return response()->json([
-                'message' => ResponseMessages::FORBIDDEN
-            ], Response::HTTP_FORBIDDEN);
-        }
-        $result = Helpers::doesUserExist($id);
-        if (gettype($result) == 'boolean') {
-            $user = User::findOrFail($id);
+        $user = Helpers::doesItExist(User::class, $id);
+        if (isset($user)) {
             $user->update([
                 'is_active' => 0
             ]);
@@ -90,17 +73,13 @@ class AdminController extends Controller
             ], Response::HTTP_OK);
         }
 
-        return $result;
+        return response()->json([
+            'message' => ResponseMessages::NOT_FOUND
+        ], Response::HTTP_NOT_FOUND);
 
     }
 
     public function getBannedUsers() {
-        if (! Gate::allows('get-banned-users')) {
-            return response()->json([
-                'message' => ResponseMessages::FORBIDDEN
-            ], Response::HTTP_FORBIDDEN);
-        }
-
         $bannedUsers = User::where('is_active', 0)->get();
 
         return UserResource::collection($bannedUsers)->response()->setStatusCode(200);
@@ -108,12 +87,6 @@ class AdminController extends Controller
     }
 
     public function getActiveUsers() {
-        if (! Gate::allows('get-active-users')) {
-            return response()->json([
-                'message' => ResponseMessages::FORBIDDEN
-            ], Response::HTTP_FORBIDDEN);
-        }
-
         $activeUsers = User::where('is_active', 1)->get();
 
         return UserResource::collection($activeUsers)->response()->setStatusCode(200);
