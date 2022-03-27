@@ -2,8 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\ResponseMessages;
 use Closure;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class EnsureAccountIsBanned
 {
@@ -18,8 +20,8 @@ class EnsureAccountIsBanned
     {
         if (! auth()->user()->is_active)
             return response()->json([
-                'message' => 'Unauthorized, your account is banned.'
-            ], 403);
+                'message' => ResponseMessages::BANNED
+            ], Response::HTTP_FORBIDDEN);
         return $next($request);
     }
 }

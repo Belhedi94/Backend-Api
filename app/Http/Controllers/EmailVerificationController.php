@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\ResponseMessages;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -15,14 +16,13 @@ class EmailVerificationController extends Controller
         $user = User::find($request->route('id'));
 
         if ($user->hasVerifiedEmail()) {
-            return response()->json(['message' => 'Email already verified'], 200);
+            return response()->json(['message' => ResponseMessages::ALREADY_VERIFIED], Response::HTTP_OK);
         }
 
         if ($user->markEmailAsVerified()) {
             event(new Verified($user));
         }
 
-        //return redirect(env('FRONT_URL') . '/email/verify/success');
-        return response()->json (['message' => 'Email successfully verified'], 200);
+        return response()->json (['message' => ResponseMessages::SUCCESSFULLY_VERIFIED], Response::HTTP_OK);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
+use App\Http\ResponseMessages;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Helpers;
@@ -12,14 +13,15 @@ use App\Rules\CountryRule;
 use App\Rules\MobileNumberRule;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Gate;
+use Symfony\Component\HttpFoundation\Response;
 
 class AdminController extends Controller
 {
     public function createUser(Request $request) {
         if (! Gate::allows('create-user')) {
             return response()->json([
-                'message' => 'You don\'t have permission to access this resource.'
-            ], 403);
+                'message' => ResponseMessages::FORBIDDEN
+            ], Response::HTTP_FORBIDDEN);
         }
         $request['mobile_number'] = Helpers::normalizeMobileNumber($request->mobile_number);
         $fields = $request->validate([
@@ -62,8 +64,8 @@ class AdminController extends Controller
     public function getAdmins() {
         if (! Gate::allows('get-admins')) {
             return response()->json([
-                'message' => 'You don\'t have permission to access this resource'
-            ], 403);
+                'message' => ResponseMessages::FORBIDDEN
+            ], Response::HTTP_FORBIDDEN);
         }
         $admins = User::where('is_admin', 1)->get();
 
@@ -73,8 +75,8 @@ class AdminController extends Controller
     public function banUser($id) {
         if (! Gate::allows('ban-user')) {
             return response()->json([
-                'message' => 'You don\'t have permission to access this resource'
-            ], 403);
+                'message' => ResponseMessages::FORBIDDEN
+            ], Response::HTTP_FORBIDDEN);
         }
         $result = Helpers::doesUserExist($id);
         if (gettype($result) == 'boolean') {
@@ -84,8 +86,8 @@ class AdminController extends Controller
             ]);
 
             return response()->json([
-                'message' => $user->username.' is successfully banned'
-            ], 200);
+                'message' => ResponseMessages::OK_BANNED
+            ], Response::HTTP_OK);
         }
 
         return $result;
@@ -95,8 +97,8 @@ class AdminController extends Controller
     public function getBannedUsers() {
         if (! Gate::allows('get-banned-users')) {
             return response()->json([
-                'message' => 'You don\'t have permission to access this resource'
-            ], 403);
+                'message' => ResponseMessages::FORBIDDEN
+            ], Response::HTTP_FORBIDDEN);
         }
 
         $bannedUsers = User::where('is_active', 0)->get();
@@ -108,8 +110,8 @@ class AdminController extends Controller
     public function getActiveUsers() {
         if (! Gate::allows('get-active-users')) {
             return response()->json([
-                'message' => 'You don\'t have permission to access this resource'
-            ], 403);
+                'message' => ResponseMessages::FORBIDDEN
+            ], Response::HTTP_FORBIDDEN);
         }
 
         $activeUsers = User::where('is_active', 1)->get();

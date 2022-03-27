@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Helpers;
 use App\Http\Resources\PostResource;
+use App\Http\ResponseMessages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Post;
+use Symfony\Component\HttpFoundation\Response;
 
 class PostsController extends Controller
 {
@@ -49,8 +51,8 @@ class PostsController extends Controller
         }
 
         return response()->json([
-            'message' => 'Page not Found!'
-        ], 404);
+            'message' => ResponseMessages::NOT_FOUND
+        ], Response::HTTP_NOT_FOUND);
     }
 
     public function update(Request $request, $id) {
@@ -79,13 +81,13 @@ class PostsController extends Controller
                 return (new PostResource($post))->response()->setStatusCode(200);
             } else
                 return response()->json([
-                    'message' => 'You are not authorized to do this action!'
-                ], 403);
+                    'message' => ResponseMessages::FORBIDDEN
+                ], Response::HTTP_FORBIDDEN);
 
         }
             return response()->json([
-                'message' => 'Page not Found!'
-            ], 404);
+                'message' => ResponseMessages::NOT_FOUND
+            ], Response::HTTP_NOT_FOUND);
     }
 
     public function destroy(Request $request, $id) {
@@ -98,17 +100,17 @@ class PostsController extends Controller
 
                 Post::destroy($id);
                 return response()->json([
-                    'message' =>'Post deleted successfully.'
-                ], 200);
+                    'message' => ResponseMessages::SUCCESSFULLY_DELETED
+                ], Response::HTTP_OK);
             } else
                 return response()->json([
-                    'message' => 'You are not authorized to do this action!'
-                ], 403);
+                    'message' => ResponseMessages::FORBIDDEN
+                ], Response::HTTP_FORBIDDEN);
 
         }
 
         return response()->json([
-            'message' => 'Page not Found!'
-        ], 404);
+            'message' => ResponseMessages::NOT_FOUND
+        ], Response::HTTP_NOT_FOUND);
     }
 }

@@ -11,10 +11,10 @@ class Role extends Model
 
     protected $fillable = ['name'];
 
-     const IS_SUPER_ADMIN = 1;
-     const IS_ADMIN = 2;
-     const IS_MANAGER = 3;
-     const IS_USER = 4;
+     public const IS_SUPER_ADMIN = 1;
+     public const IS_ADMIN = 2;
+     public const IS_MANAGER = 3;
+     public const IS_USER = 4;
 
      public function users() {
          return $this->hasMany(User::class);

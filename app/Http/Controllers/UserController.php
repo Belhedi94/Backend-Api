@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Helpers;
+use App\Http\ResponseMessages;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Gate;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Rules\UsernameRule;
 use App\Rules\MobileNumberRule;
 use App\Rules\CountryRule;
+use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
@@ -25,8 +27,8 @@ class UserController extends Controller
     {
         if (! Gate::allows('get-users')) {
             return response()->json([
-                'message' => 'You don\'t have permission to access this resource'
-            ], 403);
+                'message' => ResponseMessages::FORBIDDEN
+            ], Response::HTTP_FORBIDDEN);
         }
         return UserResource::collection(User::all())->response()->setStatusCode(200);
     }
@@ -44,8 +46,8 @@ class UserController extends Controller
             return (new UserResource(User::findOrfail($id)))->response()->setStatusCode(200);
 
         return response()->json([
-            'message' => 'Page not Found!'
-        ], 404);
+            'message' => ResponseMessages::NOT_FOUND
+        ], Response::HTTP_NOT_FOUND);
     }
 
 
@@ -62,8 +64,8 @@ class UserController extends Controller
         if ($user) {
             if (! Gate::allows('update-user', $id)) {
                 return response()->json([
-                    'message' => 'You are not authorized to do this action.'
-                ], 403);
+                    'message' => ResponseMessages::FORBIDDEN
+                ], Response::HTTP_FORBIDDEN);
             }
 
             $request['mobile_number'] = Helpers::normalizeMobileNumber($request->mobile_number);
@@ -106,8 +108,8 @@ class UserController extends Controller
         }
 
         return response()->json([
-            'message' => 'Page not Found!'
-        ], 404);
+            'message' => ResponseMessages::NOT_FOUND
+        ], Response::HTTP_NOT_FOUND);
 
 
     }
@@ -123,8 +125,9 @@ class UserController extends Controller
         if (isset($user)) {
             if (! Gate::allows('delete-user')) {
                 return response()->json([
-                    'message' => 'You don\'t have permission to access this resource'
-                ], 403);
+                    'message' => ResponseMessages::FORBIDDEN
+                ], Response::HTTP_FORBIDDEN);
+
             }
             $fileName = User::find($id)->avatar;
             if ($fileName != 'no-image.png') {
@@ -132,13 +135,14 @@ class UserController extends Controller
             }
             User::destroy($id);
             return response()->json([
-                'message' =>'User deleted successfully'
-            ], 200);
+                'message' => ResponseMessages::SUCCESSFULLY_DELETED
+            ], Response::HTTP_OK);
         }
 
         return response()->json([
-            'message' => 'Page not Found!'
-        ], 404);
+            'message' => ResponseMessages::FORBIDDEN
+        ], Response::HTTP_FORBIDDEN);
+
 
     }
 
@@ -154,9 +158,9 @@ class UserController extends Controller
         $message = $response->current();
 
         if ($message->getStatus() == 0) {
-            return response()->json(['message' => 'The message was sent successfully'], 200);
+            return response()->json(['message' => ResponseMessages::SUCCESSFULLY_SENT], 200);
         } else {
-            return response()->json(['message' => 'The message failed with status:'.$message->getStatus()]);
+            return response()->json(['message' => ResponseMessages::SENT_FAILED, $message->getStatus()]);
         }
     }
 

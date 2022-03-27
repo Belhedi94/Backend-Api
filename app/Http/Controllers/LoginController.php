@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\ResponseMessages;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 
 class LoginController extends Controller
@@ -31,8 +33,8 @@ class LoginController extends Controller
         }
 
         return response([
-            'message' => 'The provided credentials do not match our records.'
-        ], 401);
+            'message' => ResponseMessages::BAD_REQUEST
+        ], Response::HTTP_UNAUTHORIZED);
 
     }
 
@@ -46,7 +48,7 @@ class LoginController extends Controller
         }
 
         return response()->json([
-            'message' => 'Successfully logged out'
-        ], 201);
+            'message' => ResponseMessages::LOGGED_OUT
+        ], Response::HTTP_OK);
     }
 }
