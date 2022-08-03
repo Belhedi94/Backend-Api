@@ -7,6 +7,8 @@ use Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Validation\Rules\Password as PasswordRule;
+
 class ResetPasswordController extends Controller
 {
     public function forgotPassword(Request $request)
@@ -30,7 +32,7 @@ class ResetPasswordController extends Controller
             'token' => 'required',
             'email' => 'required|email',
             'password' => ['required', 'confirmed',
-                Password::min(8)
+                PasswordRule::min(8)
                     ->letters()
                     ->mixedCase()
                     ->numbers()
